@@ -383,6 +383,8 @@ enum reg_rule
 #define NB_FRAME_REGS 41
 #elif defined(__aarch64__)
 #define NB_FRAME_REGS 96
+#elif defined(__loongarch_lp64)
+#define NB_FRAME_REGS 96
 #else
 #error Unsupported architecture
 #endif
@@ -431,6 +433,11 @@ static const char *dwarf_reg_names[NB_FRAME_REGS] =
 /* 72-79 */ "v8",  "v9",  "v10", "v11", "v12", "v13", "v14", "v15",
 /* 80-87 */ "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23",
 /* 88-95 */ "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31",
+#elif defined(__loongarch_lp64)
+/*  0-7  */ "$zero", "$ra", "$tp", "$sp", "$a0", "$a1", "$a2", "$a3",
+/*  8-16 */ "$a4", "$a5", "$a6", "$a7", "$t0", "$t1", "$t2", "$t3",
+/* 17-24 */ "$t4", "$t5", "$t6", "$t7", "$t8", "$r21", "$fp", "$s0",
+/* 25-32 */ "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$s8",
 #endif
 };
 

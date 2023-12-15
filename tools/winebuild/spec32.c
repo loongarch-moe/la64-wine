@@ -37,6 +37,7 @@
 #define IMAGE_FILE_MACHINE_AMD64   0x8664
 #define IMAGE_FILE_MACHINE_ARMNT   0x01C4
 #define IMAGE_FILE_MACHINE_ARM64   0xaa64
+#define IMAGE_FILE_MACHINE_LOONGARCH64  0x6264
 
 #define IMAGE_SIZEOF_NT_OPTIONAL32_HEADER 224
 #define IMAGE_SIZEOF_NT_OPTIONAL64_HEADER 240
@@ -99,6 +100,7 @@ static int has_relays( DLLSPEC *spec )
     int i;
 
     if (target.cpu == CPU_ARM64EC) return 0;
+    if (target.cpu == CPU_LOONGARCH64) return 0;
 
     for (i = spec->base; i <= spec->limit; i++)
     {
@@ -391,7 +393,6 @@ static void output_relay_debug( DLLSPEC *spec )
             output( "\tret\n" );
             output_seh( ".seh_endproc" );
             break;
-
         default:
             assert(0);
         }
@@ -657,6 +658,8 @@ void output_module( DLLSPEC *spec )
         case CPU_ARM64EC:
             assert( 0 );
             break;
+        case CPU_LOONGARCH64:
+            break;
         }
         output( "__wine_spec_pe_header:\n" );
         output( "\t.skip %u\n", 65536 + page_size );
@@ -680,6 +683,7 @@ void output_module( DLLSPEC *spec )
     case CPU_x86_64:  machine = IMAGE_FILE_MACHINE_AMD64; break;
     case CPU_ARM:     machine = IMAGE_FILE_MACHINE_ARMNT; break;
     case CPU_ARM64:   machine = IMAGE_FILE_MACHINE_ARM64; break;
+    case CPU_LOONGARCH64: machine = IMAGE_FILE_MACHINE_LOONGARCH64; break;
     }
     output( "\t.short 0x%04x\n",          /* Machine */
              machine );
@@ -1098,6 +1102,7 @@ static void output_pe_file( DLLSPEC *spec, const char signature[32] )
     case CPU_x86_64:  put_word( IMAGE_FILE_MACHINE_AMD64 ); break;
     case CPU_ARM:     put_word( IMAGE_FILE_MACHINE_ARMNT ); break;
     case CPU_ARM64:   put_word( IMAGE_FILE_MACHINE_ARM64 ); break;
+    case CPU_LOONGARCH64:   put_word( IMAGE_FILE_MACHINE_LOONGARCH64 ); break;
     }
     put_word( pe.sec_count );                        /* NumberOfSections */
     put_dword( hash_filename(spec->file_name) );     /* TimeDateStamp */

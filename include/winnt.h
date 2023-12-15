@@ -722,6 +722,7 @@ typedef DWORD FLONG;
 #define PROCESSOR_ARCHITECTURE_ARM64            12
 #define PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64   13
 #define PROCESSOR_ARCHITECTURE_IA32_ON_ARM64    14
+#define PROCESSOR_ARCHITECTURE_LOONGARCH64      16
 #define PROCESSOR_ARCHITECTURE_UNKNOWN	0xFFFF
 
 /* dwProcessorType */
@@ -1876,6 +1877,135 @@ typedef struct _KNONVOLATILE_CONTEXT_POINTERS
 
 #endif /* __aarch64__ */
 
+#if defined(__loongarch64)
+
+// begin_ntddk begin_nthal
+//
+// The following flags control the contents of the CONTEXT structure.
+//
+
+#if !defined(RC_INVOKED)
+
+#define CONTEXT_LOONGARCH64   0x00100000
+
+
+typedef struct _LOONGARCH64_RUNTIME_FUNCTION
+{
+    DWORD BeginAddress;
+    DWORD EndAddress;
+    DWORD UnwindData;
+} LOONGARCH64_RUNTIME_FUNCTION;
+typedef LOONGARCH64_RUNTIME_FUNCTION RUNTIME_FUNCTION, *PRUNTIME_FUNCTION;
+
+#define CONTEXT_CONTROL          (CONTEXT_LOONGARCH64 | 0x00000001)
+#define CONTEXT_FLOATING_POINT   (CONTEXT_LOONGARCH64 | 0x00000002)
+#define CONTEXT_INTEGER          (CONTEXT_LOONGARCH64 | 0x00000004)
+#define CONTEXT_EXTENDED_FLOAT   (CONTEXT_FLOATING_POINT | 0x00000008)
+#define CONTEXT_EXTENDED_INTEGER (CONTEXT_INTEGER | 0x00000010)
+
+#define CONTEXT_FULL (CONTEXT_CONTROL | CONTEXT_FLOATING_POINT | \
+                      CONTEXT_INTEGER | CONTEXT_EXTENDED_INTEGER)
+
+#endif
+
+typedef struct _CONTEXT {
+    DWORD   ContextFlags;  /* 000 */
+    struct {
+	ULONG Pc;
+        ULONG XFltF0;
+        ULONG XFltF1;
+        ULONG XFltF2;
+        ULONG XFltF3;
+        ULONG XFltF4;
+        ULONG XFltF5;
+        ULONG XFltF6;
+        ULONG XFltF7;
+        ULONG XFltF8;
+        ULONG XFltF9;
+        ULONG XFltF10;
+        ULONG XFltF11;
+        ULONG XFltF12;
+        ULONG XFltF13;
+        ULONG XFltF14;
+        ULONG XFltF15;
+        ULONG XFltF16;
+        ULONG XFltF17;
+        ULONG XFltF18;
+        ULONG XFltF19;
+        ULONG XFltF20;
+        ULONG XFltF21;
+        ULONG XFltF22;
+        ULONG XFltF23;
+        ULONG XFltF24;
+        ULONG XFltF25;
+        ULONG XFltF26;
+        ULONG XFltF27;
+        ULONG XFltF28;
+        ULONG XFltF29;
+        ULONG XFltF30;
+        ULONG XFltF31;
+        BYTE XFcfr0;
+        BYTE XFcfr1;
+        BYTE XFcfr2;
+        BYTE XFcfr3;
+        BYTE XFcfr4;
+        BYTE XFcfr5;
+        BYTE XFcfr6;
+        BYTE XFcfr7;
+        BYTE XFcsr0;
+        BYTE XFcsr1;
+        BYTE XFcsr2;
+        BYTE XFcsr3;
+        BYTE Alignment0;
+        BYTE Alignment1;
+        BYTE Alignment2;
+        BYTE Alignment3;
+        DWORD XContextFlags;
+        ULONG XIntZero;
+        ULONG XIntRa;
+        ULONG XIntTp;
+        ULONG XIntSp;
+        ULONG XIntA0;
+        ULONG XIntA1;
+        ULONG XIntA2;
+        ULONG XIntA3;
+        ULONG XIntA4;
+        ULONG XIntA5;
+        ULONG XIntA6;
+        ULONG XIntA7;
+        ULONG XIntT0;
+        ULONG XIntT1;
+        ULONG XIntT2;
+        ULONG XIntT3;
+        ULONG XIntT4;
+        ULONG XIntT5;
+        ULONG XIntT6;
+        ULONG XIntT7;
+        ULONG XIntT8;
+        ULONG XInt___;
+        ULONG XIntFp;
+        ULONG XIntS0;
+        ULONG XIntS1;
+        ULONG XIntS2;
+        ULONG XIntS3;
+        ULONG XIntS4;
+        ULONG XIntS5;
+        ULONG XIntS6;
+        ULONG XIntS7;
+        ULONG XIntS8;
+    };
+} CONTEXT, *PCONTEXT;
+
+// end_ntddk end_nthal
+
+VOID
+__jump_unwind (
+    PVOID Fp,
+    PVOID TargetPc
+    );
+
+#endif // loongarch64
+
 #if !defined(CONTEXT_FULL) && !defined(RC_INVOKED)
 #error You need to define a CONTEXT for your CPU
 #endif
@@ -2056,7 +2186,45 @@ typedef void (CALLBACK *PTERMINATION_HANDLER)(BOOLEAN,DWORD64);
 #define UNW_FLAG_NHANDLER  0
 #define UNW_FLAG_EHANDLER  1
 #define UNW_FLAG_UHANDLER  2
+#elif defined(__loongarch_lp64)
+#define UNWIND_HISTORY_TABLE_SIZE 12
 
+typedef struct _UNWIND_HISTORY_TABLE_ENTRY
+{
+    DWORD64 ImageBase;
+    PRUNTIME_FUNCTION FunctionEntry;
+} UNWIND_HISTORY_TABLE_ENTRY, *PUNWIND_HISTORY_TABLE_ENTRY;
+
+typedef struct _UNWIND_HISTORY_TABLE
+{
+    DWORD   Count;
+    BYTE    LocalHint;
+    BYTE    GlobalHint;
+    BYTE    Search;
+    BYTE    Once;
+    DWORD64 LowAddress;
+    DWORD64 HighAddress;
+    UNWIND_HISTORY_TABLE_ENTRY Entry[UNWIND_HISTORY_TABLE_SIZE];
+} UNWIND_HISTORY_TABLE, *PUNWIND_HISTORY_TABLE;
+typedef struct _DISPATCHER_CONTEXT
+{
+    ULONG_PTR             ControlPc;
+    ULONG_PTR             ImageBase;
+    PRUNTIME_FUNCTION     FunctionEntry;
+    ULONG_PTR             EstablisherFrame;
+    ULONG_PTR             TargetPc;
+    PCONTEXT              ContextRecord;
+    PEXCEPTION_ROUTINE    LanguageHandler;
+    PVOID                 HandlerData;
+    PUNWIND_HISTORY_TABLE HistoryTable;
+    DWORD                 ScopeIndex;
+    BOOLEAN               ControlPcIsUnwound;
+    PBYTE                 NonVolatileRegisters;
+} DISPATCHER_CONTEXT, *PDISPATCHER_CONTEXT;
+
+
+typedef LONG (CALLBACK *PEXCEPTION_FILTER)(struct _EXCEPTION_POINTERS*,DWORD64);
+typedef void (CALLBACK *PTERMINATION_HANDLER)(BOOLEAN,DWORD64);
 #endif /* __aarch64__ */
 
 NTSYSAPI void    NTAPI RtlRaiseException(struct _EXCEPTION_RECORD*);
@@ -2436,6 +2604,13 @@ static FORCEINLINE struct _TEB * WINAPI NtCurrentTeb(void)
 {
     return (struct _TEB *)(ULONG_PTR)_MoveFromCoprocessor(15, 0, 13, 0, 2);
 }
+#elif defined(__loongarch64)
+static FORCEINLINE struct _TEB * WINAPI NtCurrentTeb(void)
+{
+    struct _TEB *teb;
+    __asm__("or %0, $tp, $zero" : "=r" (teb));
+    return teb;
+}
 #elif !defined(RC_INVOKED)
 # error You must define NtCurrentTeb() for your architecture
 #endif
@@ -2693,6 +2868,7 @@ typedef struct _IMAGE_VXD_HEADER {
 #define IMAGE_FILE_MACHINE_RISCV64      0x5064
 #define IMAGE_FILE_MACHINE_RISCV128     0x5128
 #define IMAGE_FILE_MACHINE_CEE          0xc0ee
+#define IMAGE_FILE_MACHINE_LOONGARCH64  0x6264
 
 #define	IMAGE_SIZEOF_FILE_HEADER		20
 #define IMAGE_SIZEOF_ROM_OPTIONAL_HEADER	56

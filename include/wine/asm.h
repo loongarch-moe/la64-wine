@@ -296,6 +296,7 @@
                        "bx r0\n" \
                        "2:\t.long " __ASM_NAME("__wine_syscall_dispatcher") "-1b-8" )
 # endif
+#elif defined(__loongarch_lp64)
 #endif
 
 #endif  /* __WINE_WINE_ASM_H */

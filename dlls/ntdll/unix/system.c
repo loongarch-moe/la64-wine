@@ -563,6 +563,43 @@ static void get_cpuinfo( SYSTEM_CPU_INFORMATION *info )
     info->ProcessorArchitecture = PROCESSOR_ARCHITECTURE_ARM64;
     info->ProcessorFeatureBits = cpu_features.ProcessorFeatureBits = features;
 }
+#elif defined(__loongarch_lp64)
+
+static void get_cpuinfo( SYSTEM_CPU_INFORMATION *info )
+{
+    ULONGLONG features = 0;
+#ifdef linux
+    char line[512];
+    char *s, *value;
+    FILE *f = fopen("/proc/cpuinfo", "r");
+    if (f)
+    {
+        while (fgets( line, sizeof(line), f ))
+        {
+            /* NOTE: the ':' is the only character we can rely on */
+            if (!(value = strchr(line,':'))) continue;
+            /* terminate the valuename */
+            s = value - 1;
+            while ((s >= line) && (*s == ' ' || *s == '\t')) s--;
+            s[1] = 0;
+            /* and strip leading spaces from value */
+            value += 1;
+            while (*value == ' ' || *value == '\t') value++;
+            if ((s = strchr( value,'\n' ))) *s = 0;
+            if (!strcmp( line, "CPU Revision" ))
+            {
+                info->ProcessorRevision = atoi(value);
+                continue;
+            }
+        }
+        fclose( f );
+    }
+#else
+    FIXME("CPU Feature detection not implemented.\n");
+#endif
+    info->ProcessorArchitecture = PROCESSOR_ARCHITECTURE_LOONGARCH64;
+    info->ProcessorFeatureBits = cpu_features.ProcessorFeatureBits = features;
+}
 
 #endif /* End architecture specific feature detection for CPUs */
 

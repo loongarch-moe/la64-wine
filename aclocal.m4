@@ -301,7 +301,7 @@ wine_fn_config_makefile ()
     AS_VAR_COPY([enable],[$[2]])
     case "$enable" in
       no) AS_VAR_APPEND([DISABLED_SUBDIRS],[" $[1]"]) ;;
-      *aarch64*|*arm*|*i386*|*x86_64*)
+      *aarch64*|*arm*|*i386*|*x86_64*|*loongarch*)
         if test -n "$PE_ARCHS"
         then
             for i in $PE_ARCHS

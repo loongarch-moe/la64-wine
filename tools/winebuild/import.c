@@ -802,6 +802,9 @@ static void output_import_thunk( const char *name, const char *table, int pos )
     case CPU_ARM64EC:
         assert( 0 );
         break;
+    case CPU_LOONGARCH64:
+        output( "\tbl %%plt(%s)\n", table );
+        break;
     }
     output_function_size( name );
 }
@@ -1124,6 +1127,18 @@ static void output_delayed_import_thunks( const DLLSPEC *spec )
         case CPU_ARM64EC:
             assert( 0 );
             break;
+        case CPU_LOONGARCH64:
+            output( "\tst.d $r0, $sp, -80\n");
+            output( "\tori $sp, $r0, 0\n");
+            output( "\tst.d $r0, $sp, 16\n");
+            output( "\tst.d $r1, $sp, 32\n");
+            output( "\tst.d $r2, $sp, 48\n");
+            output( "\tst.d $r3, $sp, 64\n");
+            //output( "\tori $r0, $zero\n");
+            output( "\tla $r0, %s\n", ".L__wine_spec_delay_imports");
+            output( "\tla $t1, %s\n", asm_name("__delayLoadHelper2"));
+            output( "\tjirl $t1, $r0, 0\n");
+            break;
         }
         output_cfi( ".cfi_endproc" );
         output_function_size( module_func );
@@ -1175,6 +1190,11 @@ static void output_delayed_import_thunks( const DLLSPEC *spec )
                 break;
             case CPU_ARM64EC:
                 assert( 0 );
+                break;
+            case CPU_LOONGARCH64:
+                output( "\tla $r1, %s\n", ".L__wine_delay_IAT");
+                if (iat_pos) output( "\tori $r1, $r1, %u\n", iat_pos);
+                output( "\tb %s\n", asm_name(module_func) );
                 break;
             }
             iat_pos += get_ptr_size();
@@ -1360,6 +1380,10 @@ void output_stubs( DLLSPEC *spec )
             output( "\tb %s\n", arm64_name("__wine_spec_unimplemented_stub") );
             output_seh( ".seh_endproc" );
             break;
+        case CPU_LOONGARCH64:
+            output( "\tb %%plt(%s)\n", "__wine_spec_unimplemented_stub" );
+            output( "ret\t\n" );
+            continue;
         }
         output_function_size( name );
     }
@@ -1427,6 +1451,7 @@ static const char *get_target_machine(void)
         [CPU_ARM]     = "arm",
         [CPU_ARM64]   = "arm64",
         [CPU_ARM64EC] = "arm64ec",
+        [CPU_LOONGARCH64] = "loongarch64"
     };
 
     return machine_names[target.cpu];
@@ -1503,6 +1528,8 @@ static void build_dlltool_import_lib( const char *lib_name, DLLSPEC *spec, struc
         case CPU_ARM64EC:
             strarray_add( &args, "-m" );
             strarray_add( &args, "arm64ec" );
+            break;
+        case CPU_LOONGARCH64:
             break;
         default:
             break;
@@ -1612,6 +1639,9 @@ static void build_windows_import_lib( const char *lib_name, DLLSPEC *spec, struc
             output_seh( ".seh_endproc" );
             break;
         case CPU_ARM64EC:
+            assert( 0 );
+            break;
+        case CPU_LOONGARCH64:
             assert( 0 );
             break;
         }
@@ -1758,6 +1788,9 @@ static void build_windows_import_lib( const char *lib_name, DLLSPEC *spec, struc
                 }
                 break;
             case CPU_ARM64EC:
+                assert( 0 );
+                break;
+            case CPU_LOONGARCH64:
                 assert( 0 );
                 break;
             }

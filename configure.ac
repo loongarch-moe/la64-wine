@@ -15,7 +15,7 @@ libwine_version="1.0"
 
 dnl **** Command-line arguments ****
 
-AC_ARG_ENABLE(archs, AS_HELP_STRING([--enable-archs={i386,x86_64,arm,aarch64}],[enable multiple architectures for PE compilation]))
+AC_ARG_ENABLE(archs, AS_HELP_STRING([--enable-archs={i386,x86_64,arm,aarch64,loongarch64}],[enable multiple architectures for PE compilation]))
 AC_ARG_ENABLE(win16, AS_HELP_STRING([--disable-win16],[do not include Win16 support]))
 AC_ARG_ENABLE(win64, AS_HELP_STRING([--enable-win64],[build a Win64 emulator on AMD64 (won't run Win32 binaries)]))
 AC_ARG_ENABLE(tests, AS_HELP_STRING([--disable-tests],[do not build the regression tests]))
@@ -177,6 +177,9 @@ case $host in
     CFLAGS="$CFLAGS -mfloat-abi=$float_abi"
     TARGETFLAGS="$TARGETFLAGS -mfloat-abi=$float_abi"
     ;;
+  loongarch64)
+    dnl set what? FIXME
+    ;;
   i[[3456789]]86*)
     with_unwind=${with_unwind:-no}
     ;;
@@ -210,8 +213,10 @@ case "$host_cpu" in
   arm*)            HOST_ARCH=arm ;;
   i[[3456789]]86*) HOST_ARCH=i386 ;;
   x86_64)          HOST_ARCH=x86_64 ;;
+  loongarch64)     HOST_ARCH=loongarch64 ;;
+
 esac
-m4_set_add_all([_AC_SUBST_VARS],[HOST_ARCH]m4_foreach([cpu],[aarch64,arm,arm64ec,i386,x86_64],
+m4_set_add_all([_AC_SUBST_VARS],[HOST_ARCH]m4_foreach([cpu],[aarch64,arm,arm64ec,i386,x86_64,loongarch64],
                                 [m4_foreach([var],[CC,CFLAGS,EXTRACFLAGS,LDFLAGS,DEBUG,TARGET,DELAYLOADFLAG,DISABLED_SUBDIRS],[,cpu[_]var])]))
 
 AC_CACHE_CHECK([for the directory containing the Wine tools], wine_cv_toolsdir,
@@ -742,6 +747,7 @@ case $host_os in
         x86_64)  exec_prefix='${prefix}/x86_64' ;;
         arm)     exec_prefix='${prefix}/armeabi-v7a' ;;
         aarch64) exec_prefix='${prefix}/arm64-v8a' ;;
+
       esac
     fi
     ;;
@@ -818,7 +824,7 @@ AS_VAR_SET_IF([enable_archs],
      for arch
      do
          case $arch in
-           i386|x86_64|arm|aarch64|arm64ec) cross_archs="$cross_archs $arch" ;;
+           i386|x86_64|arm|aarch64|arm64ec|loongarch64) cross_archs="$cross_archs $arch" ;;
            *) AC_MSG_ERROR([Unknown cross-compilation architecture '$arch']) ;;
          esac
      done],
@@ -836,6 +842,9 @@ do
         [case $wine_arch in
           aarch64)
             AC_CHECK_PROGS(aarch64_CC,[aarch64-w64-mingw32-clang aarch64-w64-mingw32-gcc clang],[false])
+            ;;
+          loongarch64)
+            AC_CHECK_PROGS(loongarch64_CC,[loongarch64-w64-mingw32-clang loongarch64-w64-mingw32-gcc clang],[false])
             ;;
           arm64ec)
             AC_CHECK_PROGS(arm64ec_CC,[arm64ec-w64-mingw32-clang arm64ec-w64-mingw32-gcc clang],[false])
@@ -2353,6 +2362,7 @@ dnl *** check for the need to define platform-specific symbols
 case $host_cpu in
   *i[[3456789]]86*) WINE_CHECK_DEFINE([__i386__]) ;;
   *x86_64*)         WINE_CHECK_DEFINE([__x86_64__]) ;;
+  loongarch64)      WINE_CHECK_DEFINE([__loongarch_lp64]) ;;
   *sparc64*)        WINE_CHECK_DEFINE([__sparc64__]) ;;
   *sparc*)          WINE_CHECK_DEFINE([__sparc__]) ;;
   *powerpc64*)      WINE_CHECK_DEFINE([__powerpc64__]) ;;

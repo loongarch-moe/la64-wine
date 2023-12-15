@@ -268,8 +268,8 @@
 @ stdcall GetClassInfoW(long wstr ptr)
 @ stdcall GetClassLongA(long long)
 @ stdcall GetClassLongW(long long)
-@ stdcall -arch=win64 GetClassLongPtrA(long long)
-@ stdcall -arch=win64 GetClassLongPtrW(long long)
+@ stdcall GetClassLongPtrA(long long)
+@ stdcall GetClassLongPtrW(long long)
 @ stdcall GetClassNameA(long ptr long)
 @ stdcall GetClassNameW(long ptr long)
 @ stdcall GetClassWord(long long)
@@ -414,8 +414,8 @@
 @ stdcall GetWindowDpiHostingBehavior(long)
 @ stdcall GetWindowInfo(long ptr)
 @ stdcall GetWindowLongA(long long)
-@ stdcall -arch=win64 GetWindowLongPtrA(long long)
-@ stdcall -arch=win64 GetWindowLongPtrW(long long)
+@ stdcall GetWindowLongPtrA(long long)
+@ stdcall GetWindowLongPtrW(long long)
 @ stdcall GetWindowLongW(long long)
 @ stdcall GetWindowModuleFileName(long ptr long) GetWindowModuleFileNameA
 @ stdcall GetWindowModuleFileNameA(long ptr long)
@@ -659,8 +659,8 @@
 @ stdcall SetCaretBlinkTime(long)
 @ stdcall SetCaretPos(long long)
 @ stdcall SetClassLongA(long long long)
-@ stdcall -arch=win64 SetClassLongPtrA(long long long)
-@ stdcall -arch=win64 SetClassLongPtrW(long long long)
+@ stdcall SetClassLongPtrA(long long long)
+@ stdcall SetClassLongPtrW(long long long)
 @ stdcall SetClassLongW(long long long)
 @ stdcall SetClassWord(long long long) NtUserSetClassWord
 @ stdcall SetClipboardData(long long)
@@ -733,8 +733,8 @@
 @ stdcall SetWindowDisplayAffinity(long long)
 # @ stub SetWindowFullScreenState
 @ stdcall SetWindowLongA(long long long)
-@ stdcall -arch=win64 SetWindowLongPtrA(long long long)
-@ stdcall -arch=win64 SetWindowLongPtrW(long long long)
+@ stdcall SetWindowLongPtrA(long long long)
+@ stdcall SetWindowLongPtrW(long long long)
 @ stdcall SetWindowLongW(long long long)
 @ stdcall SetWindowPlacement(long ptr) NtUserSetWindowPlacement
 @ stdcall SetWindowPos(long long long long long long long) NtUserSetWindowPos

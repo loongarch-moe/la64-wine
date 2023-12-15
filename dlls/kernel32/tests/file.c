@@ -2397,8 +2397,9 @@ static BOOL create_fake_dll( LPCSTR filename )
     nt->FileHeader.Machine = IMAGE_FILE_MACHINE_ARMNT;
 #elif defined __aarch64__
     nt->FileHeader.Machine = IMAGE_FILE_MACHINE_ARM64;
-#else
-# error You must specify the machine type
+#elif defined __loongarch_lp64
+    nt->FileHeader.Machine = IMAGE_FILE_MACHINE_LOONGARCH64;
+#else# error You must specify the machine type
 #endif
     nt->FileHeader.NumberOfSections = 1;
     nt->FileHeader.SizeOfOptionalHeader = sizeof(IMAGE_OPTIONAL_HEADER);

@@ -805,6 +805,14 @@ SED_CMD
 RUNTESTFLAGS
 MAKEDEP
 toolsdir
+loongarch64_DISABLED_SUBDIRS
+loongarch64_DELAYLOADFLAG
+loongarch64_TARGET
+loongarch64_DEBUG
+loongarch64_LDFLAGS
+loongarch64_EXTRACFLAGS
+loongarch64_CFLAGS
+loongarch64_CC
 x86_64_DISABLED_SUBDIRS
 x86_64_DELAYLOADFLAG
 x86_64_TARGET
@@ -2466,7 +2474,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-archs={i386,x86_64,arm,aarch64}
+  --enable-archs={i386,x86_64,arm,aarch64,loongarch64}
                           enable multiple architectures for PE compilation
   --disable-win16         do not include Win16 support
   --enable-win64          build a Win64 emulator on AMD64 (won't run Win32
@@ -2986,7 +2994,7 @@ else $as_nop
 #define $2 innocuous_$2
 
 /* System header to define __stub macros and hopefully few prototypes,
-   which can conflict with char $2 (); below.  */
+   which can conflict with char $2 (void); below.  */
 
 #include <limits.h>
 #undef $2
@@ -2997,7 +3005,7 @@ else $as_nop
 #ifdef __cplusplus
 extern "C"
 #endif
-char $2 ();
+char $2 (void);
 /* The GNU C library defines this for functions which it implements
     to always fail with ENOSYS.  Some functions are actually named
     something starting with __ and the normal name is an alias.  */
@@ -3493,9 +3501,7 @@ struct stat;
 /* Most of the following tests are stolen from RCS 5.7 src/conf.sh.  */
 struct buf { int x; };
 struct buf * (*rcsopen) (struct buf *, struct stat *, int);
-static char *e (p, i)
-     char **p;
-     int i;
+static char *e (char **p, int i)
 {
   return p[i];
 }
@@ -3546,6 +3552,7 @@ extern int puts (const char *);
 extern int printf (const char *, ...);
 extern int dprintf (int, const char *, ...);
 extern void *malloc (size_t);
+extern void free (void *);
 
 // Check varargs macros.  These examples are taken from C99 6.10.3.5.
 // dprintf is used instead of fprintf to avoid needing to declare
@@ -6419,6 +6426,8 @@ printf "%s\n" "$wine_cv_float_abi" >&6; }
     CFLAGS="$CFLAGS -mfloat-abi=$float_abi"
     TARGETFLAGS="$TARGETFLAGS -mfloat-abi=$float_abi"
     ;;
+  loongarch64)
+    ;;
   i[3456789]86*)
     with_unwind=${with_unwind:-no}
     ;;
@@ -6452,6 +6461,8 @@ case "$host_cpu" in
   arm*)            HOST_ARCH=arm ;;
   i[3456789]86*) HOST_ARCH=i386 ;;
   x86_64)          HOST_ARCH=x86_64 ;;
+  loongarch64)     HOST_ARCH=loongarch64 ;;
+
 esac
 
 
@@ -7619,8 +7630,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char i386_set_ldt ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char i386_set_ldt (void);
 int
 main (void)
 {
@@ -9438,7 +9455,7 @@ wine_fn_config_makefile ()
     eval enable=\$$2
     case "$enable" in
       no) as_fn_append DISABLED_SUBDIRS " $1" ;;
-      *aarch64*|*arm*|*i386*|*x86_64*)
+      *aarch64*|*arm*|*i386*|*x86_64*|*loongarch64*)
         if test -n "$PE_ARCHS"
         then
             for i in $PE_ARCHS
@@ -9984,8 +10001,14 @@ LIBS="-lEGL  $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char eglGetProcAddress ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char eglGetProcAddress (void);
 int
 main (void)
 {
@@ -10038,8 +10061,14 @@ LIBS="-lGLESv2  $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char glFlush ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char glFlush (void);
 int
 main (void)
 {
@@ -10087,6 +10116,8 @@ fi
         x86_64)  exec_prefix='${prefix}/x86_64' ;;
         arm)     exec_prefix='${prefix}/armeabi-v7a' ;;
         aarch64) exec_prefix='${prefix}/arm64-v8a' ;;
+        loongarch64)  exec_prefix='${prefix}/loongarch64' ;;
+
       esac
     fi
     ;;
@@ -10319,7 +10350,7 @@ then :
      for arch
      do
          case $arch in
-           i386|x86_64|arm|aarch64|arm64ec) cross_archs="$cross_archs $arch" ;;
+           i386|x86_64|arm|aarch64|arm64ec|loongarch64) cross_archs="$cross_archs $arch" ;;
            *) as_fn_error $? "Unknown cross-compilation architecture '$arch'" "$LINENO" 5 ;;
          esac
      done
@@ -10386,6 +10417,56 @@ fi
   test -n "$aarch64_CC" && break
 done
 test -n "$aarch64_CC" || aarch64_CC="false"
+
+            ;;
+          loongarch64)
+            for ac_prog in loongarch64-w64-mingw32-clang loongarch64-w64-mingw32-gcc clang
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_loongarch64_CC+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  if test -n "$loongarch64_CC"; then
+  ac_cv_prog_loongarch64_CC="$loongarch64_CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_loongarch64_CC="$ac_prog"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+loongarch64_CC=$ac_cv_prog_loongarch64_CC
+if test -n "$loongarch64_CC"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $loongarch64_CC" >&5
+printf "%s\n" "$loongarch64_CC" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+
+  test -n "$loongarch64_CC" && break
+done
+test -n "$loongarch64_CC" || loongarch64_CC="false"
 
             ;;
           arm64ec)
@@ -12024,8 +12105,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char FAudio_CommitOperationSet ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char FAudio_CommitOperationSet (void);
 int
 main (void)
 {
@@ -12134,8 +12221,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char new_fluid_synth ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char new_fluid_synth (void);
 int
 main (void)
 {
@@ -12245,8 +12338,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char jpeg_start_decompress ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char jpeg_start_decompress (void);
 int
 main (void)
 {
@@ -12355,8 +12454,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char cmsOpenProfileFromFile ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cmsOpenProfileFromFile (void);
 int
 main (void)
 {
@@ -12465,8 +12570,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char mpg123_feed ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char mpg123_feed (void);
 int
 main (void)
 {
@@ -12575,8 +12686,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char png_create_read_struct ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char png_create_read_struct (void);
 int
 main (void)
 {
@@ -12685,8 +12802,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char TIFFClientOpen ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char TIFFClientOpen (void);
 int
 main (void)
 {
@@ -12875,8 +12998,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char xmlFirstElementChild ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char xmlFirstElementChild (void);
 int
 main (void)
 {
@@ -13028,8 +13157,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char xsltCompilePattern ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char xsltCompilePattern (void);
 int
 main (void)
 {
@@ -13181,8 +13316,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char vkd3d_set_log_callback ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char vkd3d_set_log_callback (void);
 int
 main (void)
 {
@@ -13228,8 +13369,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char vkd3d_shader_serialize_dxbc ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char vkd3d_shader_serialize_dxbc (void);
 int
 main (void)
 {
@@ -13344,8 +13491,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char inflate ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char inflate (void);
 int
 main (void)
 {
@@ -13649,8 +13802,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char pthread_create ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pthread_create (void);
 int
 main (void)
 {
@@ -14138,8 +14297,14 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XOpenDisplay ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XOpenDisplay (void);
 int
 main (void)
 {
@@ -14165,8 +14330,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char dnet_ntoa ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dnet_ntoa (void);
 int
 main (void)
 {
@@ -14206,8 +14377,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char dnet_ntoa ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dnet_ntoa (void);
 int
 main (void)
 {
@@ -14267,8 +14444,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char gethostbyname ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gethostbyname (void);
 int
 main (void)
 {
@@ -14308,8 +14491,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char gethostbyname ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gethostbyname (void);
 int
 main (void)
 {
@@ -14365,8 +14554,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char connect ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char connect (void);
 int
 main (void)
 {
@@ -14415,8 +14610,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char remove ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char remove (void);
 int
 main (void)
 {
@@ -14465,8 +14666,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char shmat ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char shmat (void);
 int
 main (void)
 {
@@ -14517,8 +14724,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char IceConnectionNumber ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char IceConnectionNumber (void);
 int
 main (void)
 {
@@ -14567,8 +14780,14 @@ LIBS="-lX11 $X_LIBS $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XCreateWindow ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XCreateWindow (void);
 int
 main (void)
 {
@@ -14621,8 +14840,14 @@ LIBS="-lXext $X_LIBS -lX11 $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XextCreateExtension ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XextCreateExtension (void);
 int
 main (void)
 {
@@ -14749,8 +14974,14 @@ LIBS="-lXcursor $X_LIBS $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XcursorImageLoadCursor ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XcursorImageLoadCursor (void);
 int
 main (void)
 {
@@ -14820,8 +15051,14 @@ LIBS="-lXi $X_LIBS $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XOpenDevice ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XOpenDevice (void);
 int
 main (void)
 {
@@ -14903,8 +15140,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XShmQueryExtension ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XShmQueryExtension (void);
 int
 main (void)
 {
@@ -14959,8 +15202,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XShapeQueryExtension ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XShapeQueryExtension (void);
 int
 main (void)
 {
@@ -15015,8 +15264,14 @@ LIBS="-lXxf86vm $X_LIBS $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XF86VidModeQueryExtension ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XF86VidModeQueryExtension (void);
 int
 main (void)
 {
@@ -15083,8 +15338,14 @@ LIBS="-lXrender $X_LIBS $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XRenderQueryExtension ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XRenderQueryExtension (void);
 int
 main (void)
 {
@@ -15135,8 +15396,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XRenderSetPictureTransform ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XRenderSetPictureTransform (void);
 int
 main (void)
 {
@@ -15177,8 +15444,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XRenderCreateLinearGradient ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XRenderCreateLinearGradient (void);
 int
 main (void)
 {
@@ -15249,8 +15522,14 @@ LIBS="-lXrandr $X_LIBS $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XRRQueryExtension ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XRRQueryExtension (void);
 int
 main (void)
 {
@@ -15353,8 +15632,14 @@ LIBS="-lXfixes $X_LIBS $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XFixesQueryVersion ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XFixesQueryVersion (void);
 int
 main (void)
 {
@@ -15437,8 +15722,14 @@ LIBS="-lXinerama $X_LIBS $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XineramaQueryScreens ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XineramaQueryScreens (void);
 int
 main (void)
 {
@@ -15509,8 +15800,14 @@ LIBS="-lXcomposite $X_LIBS $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char XCompositeRedirectWindow ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XCompositeRedirectWindow (void);
 int
 main (void)
 {
@@ -15600,8 +15897,14 @@ LIBS="-lGL $X_LIBS -lm $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char glXCreateContext ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char glXCreateContext (void);
 int
 main (void)
 {
@@ -15645,8 +15948,14 @@ LIBS="-lGL $X_LIBS -lm $X_EXTRA_LIBS -dylib_file /System/Library/Frameworks/Open
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char glXCreateContext ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char glXCreateContext (void);
 int
 main (void)
 {
@@ -15715,8 +16024,14 @@ LIBS="-lOSMesa $X_LIBS -lm $X_EXTRA_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char OSMesaGetProcAddress ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char OSMesaGetProcAddress (void);
 int
 main (void)
 {
@@ -15858,8 +16173,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char wl_display_connect ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char wl_display_connect (void);
 int
 main (void)
 {
@@ -15983,8 +16304,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char xkb_context_new ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char xkb_context_new (void);
 int
 main (void)
 {
@@ -16061,8 +16388,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char rxkb_context_new ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char rxkb_context_new (void);
 int
 main (void)
 {
@@ -16119,8 +16452,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char clGetPlatformInfo ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char clGetPlatformInfo (void);
 int
 main (void)
 {
@@ -16174,8 +16513,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char pcap_init ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pcap_init (void);
 int
 main (void)
 {
@@ -16229,8 +16574,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char SCardEstablishContext ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char SCardEstablishContext (void);
 int
 main (void)
 {
@@ -16323,8 +16674,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char inotify_add_watch ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char inotify_add_watch (void);
 int
 main (void)
 {
@@ -16411,8 +16768,14 @@ LIBS="-ldbus-1 $DBUS_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char dbus_connection_close ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dbus_connection_close (void);
 int
 main (void)
 {
@@ -16532,8 +16895,14 @@ LIBS="-lgnutls $GNUTLS_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char gnutls_global_init ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gnutls_global_init (void);
 int
 main (void)
 {
@@ -16654,8 +17023,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char sane_init ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char sane_init (void);
 int
 main (void)
 {
@@ -16742,8 +17117,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char libusb_interrupt_event_handler ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char libusb_interrupt_event_handler (void);
 int
 main (void)
 {
@@ -16804,8 +17185,14 @@ LIBS="-lv4l2  $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char v4l2_open ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char v4l2_open (void);
 int
 main (void)
 {
@@ -16902,8 +17289,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char gp_camera_new ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gp_camera_new (void);
 int
 main (void)
 {
@@ -16976,8 +17369,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char gp_port_info_list_new ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gp_port_info_list_new (void);
 int
 main (void)
 {
@@ -17183,8 +17582,14 @@ LIBS="-lfreetype $FREETYPE_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char FT_Init_FreeType ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char FT_Init_FreeType (void);
 int
 main (void)
 {
@@ -17282,8 +17687,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char po_message_msgctxt ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char po_message_msgctxt (void);
 int
 main (void)
 {
@@ -17381,8 +17792,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char pa_stream_is_corked ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pa_stream_is_corked (void);
 int
 main (void)
 {
@@ -17490,8 +17907,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char gst_pad_new ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gst_pad_new (void);
 int
 main (void)
 {
@@ -17558,8 +17981,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char snd_pcm_hw_params_get_access_mask ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char snd_pcm_hw_params_get_access_mask (void);
 int
 main (void)
 {
@@ -17637,8 +18066,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char _oss_ioctl ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char _oss_ioctl (void);
 int
 main (void)
 {
@@ -17730,8 +18165,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char udev_new ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char udev_new (void);
 int
 main (void)
 {
@@ -17946,8 +18387,14 @@ LIBS="-lSDL2 $SDL2_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char SDL_Init ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char SDL_Init (void);
 int
 main (void)
 {
@@ -18063,8 +18510,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char capi20_register ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char capi20_register (void);
 int
 main (void)
 {
@@ -18164,8 +18617,14 @@ LIBS="-lcups $CUPS_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char cupsGetDefault ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cupsGetDefault (void);
 int
 main (void)
 {
@@ -18268,8 +18727,14 @@ LIBS="-lfontconfig $FONTCONFIG_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char FcInit ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char FcInit (void);
 int
 main (void)
 {
@@ -18378,8 +18843,14 @@ LIBS="-lkrb5 $KRB5_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char krb5_is_config_principal ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char krb5_is_config_principal (void);
 int
 main (void)
 {
@@ -18494,8 +18965,14 @@ LIBS="-lgssapi_krb5 $GSSAPI_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char gss_init_sec_context ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gss_init_sec_context (void);
 int
 main (void)
 {
@@ -18567,8 +19044,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char procstat_open_sysctl ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char procstat_open_sysctl (void);
 int
 main (void)
 {
@@ -18613,8 +19096,14 @@ LIBS="-lodbc  $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char SQLConnect ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char SQLConnect (void);
 int
 main (void)
 {
@@ -18698,8 +19187,14 @@ LIBS="-lnetapi $NETAPI_LIBS $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char libnetapi_init ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char libnetapi_init (void);
 int
 main (void)
 {
@@ -18776,8 +19271,14 @@ LIBS="-lvulkan  $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char vkGetInstanceProcAddr ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char vkGetInstanceProcAddr (void);
 int
 main (void)
 {
@@ -18832,8 +19333,14 @@ LIBS="-lMoltenVK  $LIBS"
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char vkGetInstanceProcAddr ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char vkGetInstanceProcAddr (void);
 int
 main (void)
 {
@@ -20071,8 +20578,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char dlopen ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dlopen (void);
 int
 main (void)
 {
@@ -20131,8 +20644,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char gethostbyname ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gethostbyname (void);
 int
 main (void)
 {
@@ -20191,8 +20710,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char connect ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char connect (void);
 int
 main (void)
 {
@@ -20251,8 +20776,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char inet_aton ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char inet_aton (void);
 int
 main (void)
 {
@@ -20481,8 +21012,14 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char clock_gettime ();
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char clock_gettime (void);
 int
 main (void)
 {
@@ -21266,6 +21803,35 @@ if test "x$ac_cv_cpp_def___x86_64__" = xyes
 then :
   CFLAGS="$CFLAGS -D__x86_64__"
   LINTFLAGS="$LINTFLAGS -D__x86_64__"
+fi ;;
+  loongarch64)      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether we need to define __loongarch_lp64" >&5
+printf %s "checking whether we need to define __loongarch_lp64... " >&6; }
+if test ${ac_cv_cpp_def___loongarch_lp64+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifndef __loongarch_lp64
+yes
+#endif
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "yes" >/dev/null 2>&1
+then :
+  ac_cv_cpp_def___loongarch_lp64=yes
+else $as_nop
+  ac_cv_cpp_def___loongarch_lp64=no
+fi
+rm -rf conftest*
+
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cpp_def___loongarch_lp64" >&5
+printf "%s\n" "$ac_cv_cpp_def___loongarch_lp64" >&6; }
+if test "x$ac_cv_cpp_def___loongarch_lp64" = xyes
+then :
+  CFLAGS="$CFLAGS -D__loongarch_lp64"
+  LINTFLAGS="$LINTFLAGS -D__loongarch_lp64"
 fi ;;
   *sparc64*)        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether we need to define __sparc64__" >&5
 printf %s "checking whether we need to define __sparc64__... " >&6; }
@@ -23581,6 +24147,14 @@ x86_64_DEBUG = $x86_64_DEBUG
 x86_64_TARGET = $x86_64_TARGET
 x86_64_DELAYLOADFLAG = $x86_64_DELAYLOADFLAG
 x86_64_DISABLED_SUBDIRS = $x86_64_DISABLED_SUBDIRS
+loongarch64_CC = $loongarch64_CC
+loongarch64_CFLAGS = $loongarch64_CFLAGS
+loongarch64_EXTRACFLAGS = $loongarch64_EXTRACFLAGS
+loongarch64_LDFLAGS = $loongarch64_LDFLAGS
+loongarch64_DEBUG = $loongarch64_DEBUG
+loongarch64_TARGET = $loongarch64_TARGET
+loongarch64_DELAYLOADFLAG = $loongarch64_DELAYLOADFLAG
+loongarch64_DISABLED_SUBDIRS = $loongarch64_DISABLED_SUBDIRS
 toolsdir = $toolsdir
 MAKEDEP = $MAKEDEP
 RUNTESTFLAGS = $RUNTESTFLAGS
