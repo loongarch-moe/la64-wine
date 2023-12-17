@@ -24,6 +24,213 @@ WINE_DEFAULT_DEBUG_CHANNEL(seh);
 #include "dwarf.h"
 
 /***********************************************************************
+ *           signal_set_full_context
+ */
+NTSTATUS signal_set_full_context( CONTEXT *context )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+/***********************************************************************
+ *              NtSetContextThread  (NTDLL.@)
+ *              ZwSetContextThread  (NTDLL.@)
+ */
+NTSTATUS WINAPI NtSetContextThread( HANDLE handle, const CONTEXT *context )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+
+/***********************************************************************
+ *              NtGetContextThread  (NTDLL.@)
+ *              ZwGetContextThread  (NTDLL.@)
+ */
+NTSTATUS WINAPI NtGetContextThread( HANDLE handle, CONTEXT *context )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+
+/***********************************************************************
+ *              set_thread_wow64_context
+ */
+NTSTATUS set_thread_wow64_context( HANDLE handle, const void *ctx, ULONG size )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+
+/***********************************************************************
+ *              get_thread_wow64_context
+ */
+NTSTATUS get_thread_wow64_context( HANDLE handle, void *ctx, ULONG size )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+/***********************************************************************
+ *           call_user_apc_dispatcher
+ */
+NTSTATUS call_user_apc_dispatcher( CONTEXT *context, ULONG_PTR arg1, ULONG_PTR arg2, ULONG_PTR arg3,
+                                   PNTAPCFUNC func, NTSTATUS status )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+
+/***********************************************************************
+ *           call_raise_user_exception_dispatcher
+ */
+void call_raise_user_exception_dispatcher(void)
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+}
+
+
+/***********************************************************************
+ *           call_user_exception_dispatcher
+ */
+NTSTATUS call_user_exception_dispatcher( EXCEPTION_RECORD *rec, CONTEXT *context )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+
+/***********************************************************************
+ *           KeUserModeCallbackNative
+ */
+NTSTATUS WINAPI KeUserModeCallbackNative( ULONG id, const void *args, ULONG len, void **ret_ptr, ULONG *ret_len )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+
+/***********************************************************************
+ *           NtCallbackReturn  (NTDLL.@)
+ */
+NTSTATUS WINAPI NtCallbackReturn( void *ret_ptr, ULONG ret_len, NTSTATUS status )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+
+/**********************************************************************
+ *           get_thread_ldt_entry
+ */
+NTSTATUS get_thread_ldt_entry( HANDLE handle, void *data, ULONG len, ULONG *ret_len )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+
+/******************************************************************************
+ *           NtSetLdtEntries   (NTDLL.@)
+ *           ZwSetLdtEntries   (NTDLL.@)
+ */
+NTSTATUS WINAPI NtSetLdtEntries( ULONG sel1, LDT_ENTRY entry1, ULONG sel2, LDT_ENTRY entry2 )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+
+/**********************************************************************
+ *             signal_init_threading
+ */
+void signal_init_threading(void)
+{
+}
+
+
+/**********************************************************************
+ *             signal_alloc_thread
+ */
+NTSTATUS signal_alloc_thread( TEB *teb )
+{
+    return STATUS_SUCCESS;
+}
+
+
+/**********************************************************************
+ *             signal_free_thread
+ */
+void signal_free_thread( TEB *teb )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+}
+
+
+/**********************************************************************
+ *		signal_init_process
+ */
+void signal_init_process(void)
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+}
+
+/***********************************************************************
+ *              get_wow_context
+ */
+void *get_wow_context( CONTEXT *context )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return 0;
+}
+/***********************************************************************
+ *           call_init_thunk
+ */
+void call_init_thunk( LPTHREAD_START_ROUTINE entry, void *arg, BOOL suspend, TEB *teb )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+}
+
+NTSTATUS unwind_builtin_dll( void *args )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+void DECLSPEC_NORETURN signal_start_thread( PRTL_THREAD_START_ROUTINE entry, void *arg,
+                                                   BOOL suspend, TEB *teb )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+}
+
+void DECLSPEC_NORETURN signal_exit_thread( int status, void (*func)(int), TEB *teb )
+{
+    ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+}
+
+// /***********************************************************************
+//  *           __wine_syscall_dispatcher
+//  */
+ void __wine_syscall_dispatcher(void)
+ {
+     ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+ }
+
+// /***********************************************************************
+//  *           __wine_unix_call_dispatcher
+//  */
+ void __wine_unix_call_dispatcher(void)
+ {
+     ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
+ }
+void __attribute__((naked)) DbgBreakPoint(void)
+{
+
+}
+/***********************************************************************
  *              get_native_context
  */
 void *get_native_context( CONTEXT *context )
@@ -94,6 +301,5 @@ __ASM_GLOBAL_FUNC( __wine_longjmp,
                    "sltui $a0, $a1, 1\n\t"
                    "add.d $a0, $a0, $a1\n\t"
                    "ret \n\t" )
-
 
 #endif

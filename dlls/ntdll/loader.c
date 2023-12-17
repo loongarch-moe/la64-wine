@@ -61,6 +61,9 @@ static const USHORT current_machine = IMAGE_FILE_MACHINE_ARMNT;
 #elif defined __aarch64__
 static const WCHAR pe_dir[] = L"\\aarch64-windows";
 static const USHORT current_machine = IMAGE_FILE_MACHINE_ARM64;
+#elif defined __loongarch_lp64
+static const WCHAR pe_dir[] = L"\\loongarch64-windows";
+static const USHORT current_machine = IMAGE_FILE_MACHINE_LOONGARCH64;
 #else
 static const WCHAR pe_dir[] = L"";
 static const USHORT current_machine = IMAGE_FILE_MACHINE_UNKNOWN;
@@ -74,13 +77,13 @@ typedef DWORD (CALLBACK *DLLENTRYPROC)(HMODULE,DWORD,LPVOID);
 typedef void  (CALLBACK *LDRENUMPROC)(LDR_DATA_TABLE_ENTRY *, void *, BOOLEAN *);
 
 void (FASTCALL *pBaseThreadInitThunk)(DWORD,LPTHREAD_START_ROUTINE,void *) = NULL;
-NTSTATUS (WINAPI *__wine_unix_call_dispatcher)( unixlib_handle_t, unsigned int, void * ) = __wine_unix_call;
+extern NTSTATUS (WINAPI *__wine_unix_call_dispatcher)( unixlib_handle_t, unsigned int, void * );
 
 static DWORD (WINAPI *pCtrlRoutine)(void *);
 
 SYSTEM_DLL_INIT_BLOCK LdrSystemDllInitBlock = { 0xf0 };
 
-void *__wine_syscall_dispatcher = NULL;
+extern void *__wine_syscall_dispatcher ;
 unixlib_handle_t __wine_unixlib_handle = 0;
 
 /* windows directory */

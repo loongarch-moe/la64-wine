@@ -297,6 +297,8 @@
                        "2:\t.long " __ASM_NAME("__wine_syscall_dispatcher") "-1b-8" )
 # endif
 #elif defined(__loongarch_lp64)
+# define __ASM_SYSCALL_FUNC(id) \
+    asm( "nop\n\t" \
+         "ret" :: "i" (id) )
 #endif
-
 #endif  /* __WINE_WINE_ASM_H */

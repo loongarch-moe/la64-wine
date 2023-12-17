@@ -1996,6 +1996,94 @@ typedef struct _CONTEXT {
     };
 } CONTEXT, *PCONTEXT;
 
+typedef struct _KNONVOLATILE_CONTEXT_POINTERS {
+    DWORD   ContextFlags;  /* 000 */
+    struct {
+	ULONG Pc;
+        ULONG XFltF0;
+        ULONG XFltF1;
+        ULONG XFltF2;
+        ULONG XFltF3;
+        ULONG XFltF4;
+        ULONG XFltF5;
+        ULONG XFltF6;
+        ULONG XFltF7;
+        ULONG XFltF8;
+        ULONG XFltF9;
+        ULONG XFltF10;
+        ULONG XFltF11;
+        ULONG XFltF12;
+        ULONG XFltF13;
+        ULONG XFltF14;
+        ULONG XFltF15;
+        ULONG XFltF16;
+        ULONG XFltF17;
+        ULONG XFltF18;
+        ULONG XFltF19;
+        ULONG XFltF20;
+        ULONG XFltF21;
+        ULONG XFltF22;
+        ULONG XFltF23;
+        ULONG XFltF24;
+        ULONG XFltF25;
+        ULONG XFltF26;
+        ULONG XFltF27;
+        ULONG XFltF28;
+        ULONG XFltF29;
+        ULONG XFltF30;
+        ULONG XFltF31;
+        BYTE XFcfr0;
+        BYTE XFcfr1;
+        BYTE XFcfr2;
+        BYTE XFcfr3;
+        BYTE XFcfr4;
+        BYTE XFcfr5;
+        BYTE XFcfr6;
+        BYTE XFcfr7;
+        BYTE XFcsr0;
+        BYTE XFcsr1;
+        BYTE XFcsr2;
+        BYTE XFcsr3;
+        BYTE Alignment0;
+        BYTE Alignment1;
+        BYTE Alignment2;
+        BYTE Alignment3;
+        DWORD XContextFlags;
+        ULONG XIntZero;
+        ULONG XIntRa;
+        ULONG XIntTp;
+        ULONG XIntSp;
+        ULONG XIntA0;
+        ULONG XIntA1;
+        ULONG XIntA2;
+        ULONG XIntA3;
+        ULONG XIntA4;
+        ULONG XIntA5;
+        ULONG XIntA6;
+        ULONG XIntA7;
+        ULONG XIntT0;
+        ULONG XIntT1;
+        ULONG XIntT2;
+        ULONG XIntT3;
+        ULONG XIntT4;
+        ULONG XIntT5;
+        ULONG XIntT6;
+        ULONG XIntT7;
+        ULONG XIntT8;
+        ULONG XInt___;
+        ULONG XIntFp;
+        ULONG XIntS0;
+        ULONG XIntS1;
+        ULONG XIntS2;
+        ULONG XIntS3;
+        ULONG XIntS4;
+        ULONG XIntS5;
+        ULONG XIntS6;
+        ULONG XIntS7;
+        ULONG XIntS8;
+    };
+} KNONVOLATILE_CONTEXT_POINTERS, *PKNONVOLATILE_CONTEXT_POINTERS;
+
 // end_ntddk end_nthal
 
 VOID

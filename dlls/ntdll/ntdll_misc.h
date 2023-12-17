@@ -43,6 +43,8 @@
 
 #if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || defined(__aarch64__)
 static const UINT_PTR page_size = 0x1000;
+#elif defined(__loongarch_lp64)
+static const UINT_PTR page_size = 0x2000;
 #else
 extern UINT_PTR page_size;
 #endif

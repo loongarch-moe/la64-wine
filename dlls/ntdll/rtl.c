@@ -650,7 +650,12 @@ __ASM_FASTCALL_FUNC(RtlUlonglongByteSwap, 8,
                     "bswap %eax\n\t"
                     "ret $8")
 #endif
-
+#ifdef __loongarch_lp64
+__ASM_GLOBAL_FUNC(RtlUlonglongByteSwap,
+                    "nop\n\t"
+                    "nop\n\t"
+                    "ret")
+#endif
 /*************************************************************************
  * RtlUlongByteSwap    [NTDLL.@]
  *
@@ -665,7 +670,16 @@ __ASM_FASTCALL_FUNC(RtlUlongByteSwap, 4,
                     "bswap %eax\n\t"
                     "ret")
 #endif
+#ifdef __loongarch_lp64
+__ASM_GLOBAL_FUNC(RtlUlongByteSwap,
+                    "nop\n\t"
+                    "nop\n\t"
+                    "ret")
 
+_Bool __sync_bool_compare_and_swap_16(volatile void * ptr, __int128 unsigned src,  __int128 unsigned tar){
+return 1;
+}
+#endif
 /*************************************************************************
  * RtlUshortByteSwap    [NTDLL.@]
  *
@@ -678,6 +692,13 @@ __ASM_FASTCALL_FUNC(RtlUlongByteSwap, 4,
 __ASM_FASTCALL_FUNC(RtlUshortByteSwap, 4,
                     "movb %ch,%al\n\t"
                     "movb %cl,%ah\n\t"
+                    "ret")
+#endif
+
+#ifdef __loongarch64
+__ASM_GLOBAL_FUNC(RtlUshortByteSwap,
+                    "nop\n\t"
+                    "nop\n\t"
                     "ret")
 #endif
 

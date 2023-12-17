@@ -1861,7 +1861,8 @@ static void init_supported_machines(void)
         supported_machines[count++] = IMAGE_FILE_MACHINE_I386;
     }
     supported_machines[count++] = IMAGE_FILE_MACHINE_ARMNT;
-#elif defined(__loongarch64)
+#elif defined(__loongarch_lp64)
+    supported_machines[count++] = IMAGE_FILE_MACHINE_LOONGARCH64;
     if (prefix_type == PREFIX_64BIT)
     {
         supported_machines[count++] = IMAGE_FILE_MACHINE_ARM64;
@@ -1998,6 +1999,8 @@ void init_registry(void)
             {
             case IMAGE_FILE_MACHINE_I386:  mkdir( "drive_c/windows/syswow64", 0777 ); break;
             case IMAGE_FILE_MACHINE_ARMNT: mkdir( "drive_c/windows/sysarm32", 0777 ); break;
+            case IMAGE_FILE_MACHINE_AMD64: mkdir( "drive_c/windows/sysamd32", 0777 ); break;
+            case IMAGE_FILE_MACHINE_LOONGARCH64: mkdir( "drive_c/windows/sysloongarch32", 0777 ); break;
             }
         }
     }

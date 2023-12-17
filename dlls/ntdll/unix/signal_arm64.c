@@ -1968,5 +1968,4 @@ __ASM_GLOBAL_FUNC( __wine_longjmp,
                    "ldp d14, d15, [x0, #0xb0]\n\t" /* jmp_buf->D[6-7] */
                    "mov x0, x1\n\t"                /* retval */
                    "ret" )
-
 #endif  /* __aarch64__ */
