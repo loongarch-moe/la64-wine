@@ -63,6 +63,7 @@ const char *get_machine_str(int mach)
     case IMAGE_FILE_MACHINE_RISCV32:	return "RISC-V 32-bit";
     case IMAGE_FILE_MACHINE_RISCV64:	return "RISC-V 64-bit";
     case IMAGE_FILE_MACHINE_RISCV128:	return "RISC-V 128-bit";
+    case IMAGE_FILE_MACHINE_LOONGARCH64:   return "LOONGARCH 64-bit";
     }
     return "???";
 }

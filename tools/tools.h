@@ -447,7 +447,7 @@ static inline struct target get_default_target(void)
     target.cpu = CPU_ARM;
 #elif defined(__aarch64__)
     target.cpu = CPU_ARM64;
-#elif defined(__loongarch64)
+#elif defined(__loongarch_lp64)
     target.cpu = CPU_LOONGARCH64;
 #else
 #error Unsupported CPU

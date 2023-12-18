@@ -690,6 +690,7 @@ static void compile(struct options* opts, const char* lang)
         {
         case CPU_x86_64:
         case CPU_ARM64:
+        case CPU_LOONGARCH64:
             strarray_add(&comp_args, "-D__stdcall=__attribute__((ms_abi))");
             strarray_add(&comp_args, "-D__cdecl=__stdcall");
             strarray_add(&comp_args, "-D__fastcall=__stdcall");
@@ -705,8 +706,6 @@ static void compile(struct options* opts, const char* lang)
             strarray_add(&comp_args, "-D__fastcall=__stdcall");
             break;
         case CPU_ARM64EC:
-            break;
-        case CPU_LOONGARCH64:
             break;
         }
         strarray_add(&comp_args, "-D_stdcall=__stdcall");

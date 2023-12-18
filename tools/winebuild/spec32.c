@@ -100,7 +100,7 @@ static int has_relays( DLLSPEC *spec )
     int i;
 
     if (target.cpu == CPU_ARM64EC) return 0;
-    if (target.cpu == CPU_LOONGARCH64) return 0;
+//    if (target.cpu == CPU_LOONGARCH64) return 0;
 
     for (i = spec->base; i <= spec->limit; i++)
     {
@@ -393,6 +393,39 @@ static void output_relay_debug( DLLSPEC *spec )
             output( "\tret\n" );
             output_seh( ".seh_endproc" );
             break;
+	case CPU_LOONGARCH64:
+            int stack_size = 16 * ((min(odp->u.func.nb_args, 8) + 1) / 2);
+
+            output( "\t.balign 4\n" );
+            output( "__wine_spec_relay_entry_point_%d:\n", i );
+            output_seh( ".seh_proc __wine_spec_relay_entry_point_%d", i );
+            output( "\tst.d $sp, $sp, -%u\n", stack_size + 16 );
+            output_seh( ".seh_save_fplr_x %u", stack_size + 16 );
+            output_seh( ".seh_set_fp" );
+            output_seh( ".seh_endprologue" );
+            switch (stack_size)
+            {
+            case 64: output( "\tst.d $a3, $sp, 64\n" );
+            /* fall through */
+            case 48: output( "\tst.d $a2, $sp, 48\n" );
+            /* fall through */
+            case 32: output( "\tst.d $a1, $sp, 32\n" );
+            /* fall through */
+            case 16: output( "\tst.d $a0, $sp, 16\n" );
+            /* fall through */
+            default: break;
+            }
+            output( "\taddi.d $a2, $sp, 16\n");
+            output( "\tst.d $a4, $sp, -16\n" );
+            //output( "\taddi.d $t1,$t1, %u\n", odp->u.func.args_str_offset << 16 );
+            //if (i - spec->base) output( "\taddi.d $t1, $t1, %u\n", i - spec->base );
+            output( "\tla $a0, %s\n", ".L__wine_spec_relay_descr" );
+            output( "\tld.d $a3, $a0, 8\n");
+            output( "\tjirl $a3,$a3,0\n");
+            output( "\taddi.d $sp,$sp, %u\n" , stack_size + 16 );
+            output( "\tret\n");
+            output_seh( ".seh_endproc" );
+            break;
         default:
             assert(0);
         }
@@ -659,6 +692,8 @@ void output_module( DLLSPEC *spec )
             assert( 0 );
             break;
         case CPU_LOONGARCH64:
+            output( "\n\t.section \".init\",\"ax\"\n" );
+            output( "\tb 1f\n" );
             break;
         }
         output( "__wine_spec_pe_header:\n" );

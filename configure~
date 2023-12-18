@@ -6427,7 +6427,7 @@ printf "%s\n" "$wine_cv_float_abi" >&6; }
     TARGETFLAGS="$TARGETFLAGS -mfloat-abi=$float_abi"
     ;;
   loongarch64)
-        ;;
+    ;;
   i[3456789]86*)
     with_unwind=${with_unwind:-no}
     ;;
@@ -9455,7 +9455,7 @@ wine_fn_config_makefile ()
     eval enable=\$$2
     case "$enable" in
       no) as_fn_append DISABLED_SUBDIRS " $1" ;;
-      *aarch64*|*arm*|*i386*|*x86_64*|*loongarch*)
+      *aarch64*|*arm*|*i386*|*x86_64*|*loongarch64*)
         if test -n "$PE_ARCHS"
         then
             for i in $PE_ARCHS
@@ -10116,6 +10116,7 @@ fi
         x86_64)  exec_prefix='${prefix}/x86_64' ;;
         arm)     exec_prefix='${prefix}/armeabi-v7a' ;;
         aarch64) exec_prefix='${prefix}/arm64-v8a' ;;
+        loongarch64)  exec_prefix='${prefix}/loongarch64' ;;
 
       esac
     fi
