@@ -803,7 +803,7 @@ static void output_import_thunk( const char *name, const char *table, int pos )
         assert( 0 );
         break;
     case CPU_LOONGARCH64:
-        output( "\tbl %%plt(%s)\n", table );
+        output( "\tbl  %s+%u\n",table, pos );
         break;
     }
     output_function_size( name );

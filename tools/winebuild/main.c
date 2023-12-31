@@ -402,7 +402,7 @@ static void option_callback( int optc, char *optarg )
         else if (!strcmp( optarg, "unicode" )) main_spec->unicode_app = 1;
         else if (!strncmp( optarg, "cpu=", 4 )) cpu_option = xstrdup( optarg + 4 );
         else if (!strncmp( optarg, "fpu=", 4 )) fpu_option = xstrdup( optarg + 4 );
-        else if (!strncmp( optarg, "arch=", 10 )) arch_option = xstrdup( optarg + 10 );
+        else if (!strncmp( optarg, "arch=", 5 )) arch_option = xstrdup( optarg + 5 );
         else if (!strncmp( optarg, "float-abi=", 10 )) float_abi_option = xstrdup( optarg + 10 );
         else fatal_error( "Unknown -m option '%s'\n", optarg );
         break;

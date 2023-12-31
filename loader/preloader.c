@@ -661,6 +661,9 @@ void *thread_data[256];
 void _start(void);
 extern char _end[];
 __ASM_GLOBAL_FUNC(_start,
+                  "move $a0, $sp\n\t"
+                  "addi.d $sp, $sp, -144\n\t"
+                  "st.d $a0, $sp, 0\n\t"
                   "b wld_start\n\t"
                   "ret")
 
@@ -1022,6 +1025,9 @@ static void map_so_lib( const char *name, struct wld_link_map *l)
 #elif defined(__arm__)
     if( header->e_machine != EM_ARM )
         fatal_error("%s: not an arm ELF binary... don't know how to load it\n", name );
+#elif defined(__loongarch_lp64)
+    if( header->e_machine != EM_LOONGARCH )
+        fatal_error("%s: not an loongarch ELF binary... don't know how to load it\n", name );
 #endif
 
     if (header->e_phnum > sizeof(loadcmds)/sizeof(loadcmds[0]))

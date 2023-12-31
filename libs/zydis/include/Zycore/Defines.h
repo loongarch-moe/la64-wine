@@ -140,6 +140,8 @@
 #   define ZYAN_PPC64
 #elif defined(__powerpc__)
 #   define ZYAN_PPC
+#elif defined(__loongarch_lp64)
+#   define ZYAN_LOONGARCH64
 #elif defined(__riscv) && __riscv_xlen == 64
 #   define ZYAN_RISCV64
 #else

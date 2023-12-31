@@ -14,7 +14,9 @@ static BOOL loongarch64_get_addr(HANDLE hThread, const CONTEXT* ctx,
 {
     addr->Mode    = AddrModeFlat;
     addr->Segment = 0; /* don't need segment */
+    #ifdef __loongarch_lp64
     asm("break 0");
+#endif
 
 }
 
@@ -54,7 +56,10 @@ static BOOL loongarch64_fetch_minidump_thread(struct dump_context* dc, unsigned 
 {
     if (ctx->ContextFlags && (flags & ThreadWriteInstructionWindow))
     {
-      asm("break 0");
+
+#ifdef __loongarch_lp64
+   asm("break 0");
+#endif
     }
 
     return TRUE;

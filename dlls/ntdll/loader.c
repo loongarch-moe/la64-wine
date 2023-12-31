@@ -83,8 +83,8 @@ static DWORD (WINAPI *pCtrlRoutine)(void *);
 
 SYSTEM_DLL_INIT_BLOCK LdrSystemDllInitBlock = { 0xf0 };
 
-extern void *__wine_syscall_dispatcher ;
-unixlib_handle_t __wine_unixlib_handle = 0;
+void *__wine_syscall_dispatcher = NULL;
+//unixlib_handle_t __wine_unixlib_handle = 0;
 
 /* windows directory */
 const WCHAR windows_dir[] = L"C:\\windows";

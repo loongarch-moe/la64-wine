@@ -2028,6 +2028,7 @@ dnl **** Platform-specific checks ****
 case "$HOST_ARCH,$PE_ARCHS" in
   x86_64,*i386*) wine_binary="wine" ;;
   x86_64,*) wine_binary="wine64" ;;
+  loongarch64,*) wine_binary="wine64" ;;
   *) wine_binary="wine" ;;
 esac
 AC_SUBST(WINELOADER_PROGRAMS,"$wine_binary")

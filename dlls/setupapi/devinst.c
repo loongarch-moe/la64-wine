@@ -61,6 +61,8 @@ static const WCHAR NtPlatformExtension[]  = {'.','N','T','a','m','d','6','4',0};
 static const WCHAR NtPlatformExtension[]  = {'.','N','T','a','r','m',0};
 #elif defined(__aarch64__)
 static const WCHAR NtPlatformExtension[]  = {'.','N','T','a','r','m','6','4',0};
+#elif defined(__loongarch_lp64)
+static const WCHAR NtPlatformExtension[]  = {'.','N','T','l','o','o','n','g','a','r','c','h','6','4',0};
 #endif
 static const WCHAR Signature[]  = {'S','i','g','n','a','t','u','r','e',0};
 static const WCHAR Version[]  = {'V','e','r','s','i','o','n',0};

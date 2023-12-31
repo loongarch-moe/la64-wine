@@ -2221,12 +2221,12 @@ typedef struct _DISPATCHER_CONTEXT
 
 typedef LONG (CALLBACK *PEXCEPTION_FILTER)(struct _EXCEPTION_POINTERS*,DWORD64);
 typedef void (CALLBACK *PTERMINATION_HANDLER)(BOOLEAN,DWORD64);
-#endif /* __aarch64__ */
+#endif
 
 NTSYSAPI void    NTAPI RtlRaiseException(struct _EXCEPTION_RECORD*);
 NTSYSAPI void    NTAPI RtlUnwind(void*,void*,struct _EXCEPTION_RECORD*,void*);
 
-#if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__)
+#if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) || defined(__loongarch_lp64)
 
 typedef PRUNTIME_FUNCTION (CALLBACK *PGET_RUNTIME_FUNCTION_CALLBACK)(DWORD_PTR,PVOID);
 

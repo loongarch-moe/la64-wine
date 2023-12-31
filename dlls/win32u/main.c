@@ -2161,6 +2161,9 @@ BOOL SYSCALL_API __wine_send_input( HWND hwnd, const INPUT *input, const RAWINPU
 #ifdef _WIN64
 #define SYSCALL_ENTRY(id,name,args) __ASM_SYSCALL_FUNC( id + 0x1000, name )
 ALL_SYSCALLS64
+#ifdef __loongarch_lp64
+DEFINE_SYSCALL_HELPER32()
+#endif
 #else
 #define SYSCALL_ENTRY(id,name,args) __ASM_SYSCALL_FUNC( id + 0x1000, name, args )
 DEFINE_SYSCALL_HELPER32()

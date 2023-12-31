@@ -1,3 +1,6 @@
+#if 0
+#pragma makedep unix
+#endif
 #ifdef __loongarch_lp64
 #include "config.h"
 
@@ -211,13 +214,11 @@ void DECLSPEC_NORETURN signal_exit_thread( int status, void (*func)(int), TEB *t
     ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
 }
 
-// /***********************************************************************
-//  *           __wine_syscall_dispatcher
-//  */
- void __wine_syscall_dispatcher(void)
- {
-     ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
- }
+/***********************************************************************
+ *           __wine_syscall_dispatcher
+ */
+__ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+                   "break 1;ret")
 
 // /***********************************************************************
 //  *           __wine_unix_call_dispatcher
@@ -301,5 +302,12 @@ __ASM_GLOBAL_FUNC( __wine_longjmp,
                    "sltui $a0, $a1, 1\n\t"
                    "add.d $a0, $a0, $a1\n\t"
                    "ret \n\t" )
+/***********************************************************************
+ *           KeUserModeCallback
+ */
+NTSTATUS KeUserModeCallback( ULONG id, const void *args, ULONG len, void **ret_ptr, ULONG *ret_len )
+{
+     ERR("%s: NOT Implemented On LoongArch64\n", __FUNCTION__); exit(1);
 
+}
 #endif

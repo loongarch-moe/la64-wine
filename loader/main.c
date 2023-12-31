@@ -134,6 +134,8 @@ static void *load_ntdll( char *argv0 )
 #define SO_DIR "arm-unix/"
 #elif defined(__aarch64__)
 #define SO_DIR "aarch64-unix/"
+#elif defined(__loongarch_lp64)
+#define SO_DIR "loongarch64-unix/"
 #else
 #define SO_DIR ""
 #endif

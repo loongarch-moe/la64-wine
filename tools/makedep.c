@@ -117,7 +117,7 @@ static const struct
     { FLAG_IDL_REGISTER,   "_r.res" },
 };
 
-#define HASH_SIZE 197
+#define HASH_SIZE 204
 
 static struct list files[HASH_SIZE];
 static struct list global_includes[HASH_SIZE];
@@ -126,7 +126,7 @@ enum install_rules { INSTALL_LIB, INSTALL_DEV, INSTALL_TEST, NB_INSTALL_RULES };
 static const char *install_targets[NB_INSTALL_RULES] = { "install-lib", "install-dev", "install-test" };
 static const char *install_variables[NB_INSTALL_RULES] = { "INSTALL_LIB", "INSTALL_DEV", "INSTALL_TEST" };
 
-#define MAX_ARCHS 6
+#define MAX_ARCHS 8
 
 /* variables common to all makefiles */
 static struct strarray archs;

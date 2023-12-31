@@ -301,7 +301,7 @@ EXCEPTION_DISPOSITION WINAPI call_unhandled_exception_handler( EXCEPTION_RECORD 
 }
 
 
-#if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__)
+#if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) || defined(__loongarch_lp64)
 
 struct dynamic_unwind_entry
 {
@@ -346,7 +346,7 @@ static ULONG_PTR get_runtime_function_end( RUNTIME_FUNCTION *func, ULONG_PTR add
         } *info = (struct unwind_info *)(addr + func->UnwindData);
         return func->BeginAddress + info->function_length * 2;
     }
-#else  /* __aarch64__ */
+#elif defined( __aarch64__ )
     if (func->Flag) return func->BeginAddress + func->FunctionLength * 4;
     else
     {
@@ -361,6 +361,8 @@ static ULONG_PTR get_runtime_function_end( RUNTIME_FUNCTION *func, ULONG_PTR add
         } *info = (struct unwind_info *)(addr + func->UnwindData);
         return func->BeginAddress + info->function_length * 4;
     }
+#elif defined(__loongarch_lp64)
+    return func->EndAddress;
 #endif
 }
 

@@ -772,7 +772,11 @@ int sort_func_list( ORDDEF **list, int count, int (*compare)(const void *, const
 /* return the page size for the target CPU */
 unsigned int get_page_size(void)
 {
+#ifdef __loongarch_lp64
+    return 0x4000;
+#else
     return 0x1000;  /* same on all platforms */
+#endif
 }
 
 /* return the total size in bytes of the arguments on the stack */

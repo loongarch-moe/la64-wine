@@ -251,6 +251,8 @@ extern struct backend_cpu be_x86_64;
 extern struct backend_cpu be_arm;
 #elif defined(__aarch64__) && !defined(__AARCH64EB__)
 extern struct backend_cpu be_arm64;
+#elif defined(__loongarch_lp64)
+extern struct backend_cpu be_loongarch64;
 #else
 # error CPU unknown
 #endif
@@ -302,6 +304,8 @@ struct dbg_process*	dbg_add_process(const struct be_process_io* pio, DWORD pid, 
     p->be_cpu = &be_arm;
 #elif defined(__aarch64__) && !defined(__AARCH64EB__)
     p->be_cpu = &be_arm64;
+#elif defined(__loongarch_lp64)
+    p->be_cpu = &be_loongarch64;
 #else
 # error CPU unknown
 #endif
