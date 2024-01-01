@@ -664,13 +664,17 @@ __ASM_GLOBAL_FUNC(_start,
                   "move $a0, $sp\n\t"
                   "addi.d $sp, $sp, -144\n\t"
                   "st.d $a0, $sp, 0\n\t"
-                  "b wld_start\n\t"
+                  "la $a0, thread_data\n\t"
+                  "addi.d  $tp, $a0, 0\n\t"
+                  "addi.d  $a0, $sp, 0\n\t"
+                  "bl wld_start\n\t"
+                  "addi.d  $a1, $sp, 0\n\t"
+                  "addi.d  $a0, $ra, 0\n\t"
                   "ret")
 
 #define SYSCALL_FUNC( name, nr ) \
     __ASM_GLOBAL_FUNC( name, \
                        "li.w $a7, " #nr "\n\t" \
-                       "move $a0, $s0\n\t" \
                        "syscall 0x0\n\t" \
                        "ret" )
 
