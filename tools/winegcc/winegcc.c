@@ -481,8 +481,13 @@ static struct strarray get_link_args( struct options *opts, const char *output_n
             if (!try_link( opts->prefix, link_args, strmake("-Wl,-Ttext-segment=%s", opts->image_base)) )
                 strarray_add( &flags, strmake("-Wl,-Ttext-segment=%s", opts->image_base) );
         }
+#if defined __loongarch_lp64
+        if (!try_link( opts->prefix, link_args, "-Wl,-z,max-page-size=0x4000"))
+            strarray_add( &flags, "-Wl,-z,max-page-size=0x4000");
+#else
         if (!try_link( opts->prefix, link_args, "-Wl,-z,max-page-size=0x1000"))
             strarray_add( &flags, "-Wl,-z,max-page-size=0x1000");
+#endif
         break;
     }
 

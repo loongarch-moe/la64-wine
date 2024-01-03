@@ -103,6 +103,7 @@
 #ifndef MAP_NORESERVE
 #define MAP_NORESERVE 0
 #endif
+#define DUMP_AUX_INFO 1
 
 static struct wine_preload_info preload_info[] =
 {
@@ -668,9 +669,9 @@ __ASM_GLOBAL_FUNC(_start,
                   "addi.d  $tp, $a0, 0\n\t"
                   "addi.d  $a0, $sp, 0\n\t"
                   "bl wld_start\n\t"
-                  "addi.d  $a1, $sp, 0\n\t"
-                  "addi.d  $a0, $ra, 0\n\t"
-                  "ret")
+                  "addi.d $sp, $s1, 0\n\t"
+                  "pcaddi $a0, -17557\n\t"
+                  "jr $s0")
 
 #define SYSCALL_FUNC( name, nr ) \
     __ASM_GLOBAL_FUNC( name, \
@@ -1467,7 +1468,6 @@ static void set_process_name( int argc, char *argv[] )
     for (i = 1; i < argc; i++) argv[i] -= off;
 }
 
-
 /*
  *  wld_start
  *
@@ -1500,7 +1500,11 @@ void* wld_start( void **stack )
     }
 
     av = (struct wld_auxv *)(p+1);
+#ifdef __loongarch_lp64
+    page_size = get_auxiliary( av, AT_PAGESZ, 16384);
+#else
     page_size = get_auxiliary( av, AT_PAGESZ, 4096 );
+#endif
     page_mask = page_size - 1;
 
     preloader_start = (char *)((unsigned long)_start & ~page_mask);
