@@ -3733,7 +3733,7 @@ static ULONG_PTR eval_expression(const struct module* module, struct cpu_stack_w
             }
             break;
         default:
-            FIXME("unhandled opcode %02x\n", opcode);
+//            FIXME("unhandled opcode %02x\n", opcode);
         }
     }
     return stack[sp];

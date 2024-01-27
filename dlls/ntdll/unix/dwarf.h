@@ -435,9 +435,13 @@ static const char *dwarf_reg_names[NB_FRAME_REGS] =
 /* 88-95 */ "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31",
 #elif defined(__loongarch_lp64)
 /*  0-7  */ "$zero", "$ra", "$tp", "$sp", "$a0", "$a1", "$a2", "$a3",
-/*  8-16 */ "$a4", "$a5", "$a6", "$a7", "$t0", "$t1", "$t2", "$t3",
-/* 17-24 */ "$t4", "$t5", "$t6", "$t7", "$t8", "$r21", "$fp", "$s0",
-/* 25-32 */ "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$s8",
+/*  8-15 */ "$a4", "$a5", "$a6", "$a7", "$t0", "$t1", "$t2", "$t3",
+/* 17-23 */ "$t4", "$t5", "$t6", "$t7", "$t8", "$r21", "$fp", "$s0",
+/* 25-31 */ "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$s8",
+/* 32-39 */ "pc",  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,
+/* 40-47 */ NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,
+/* 48-55 */ NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,
+/* 56-63 */ NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,
 #endif
 };
 
@@ -756,6 +760,73 @@ static void *get_context_reg( CONTEXT *context, ULONG_PTR dw_reg )
     case 94:
     case 95:
         return &context->V[dw_reg - 64];
+#elif defined(__loongarch_lp64)
+    case 0:  return &context->R0;
+    case 1:  return &context->Ra;
+    case 2:  return &context->Tp;
+    case 3:  return &context->Sp;
+    case 4:  return &context->A0;
+    case 5:  return &context->A1;
+    case 6:  return &context->A2;
+    case 7:  return &context->A3;
+    case 8:  return &context->A4;
+    case 9:  return &context->A5;
+    case 10: return &context->A6;
+    case 11: return &context->A7;
+    case 12: return &context->T0;
+    case 13: return &context->T1;
+    case 14: return &context->T2;
+    case 15: return &context->T3;
+    case 16: return &context->T4;
+    case 17: return &context->T5;
+    case 18: return &context->T6;
+    case 19: return &context->T7;
+    case 20: return &context->T8;
+    case 21: return &context->X0;
+    case 22: return &context->Fp;
+    case 23: return &context->S0;
+    case 24: return &context->S1;
+    case 25: return &context->S2;
+    case 26: return &context->S3;
+    case 27: return &context->S4;
+    case 28: return &context->S5;
+    case 29: return &context->S6;
+    case 30: return &context->S7;
+    case 31: return &context->S8;
+    case 32: return &context->Pc;
+    case 64:
+    case 65:
+    case 66:
+    case 67:
+    case 68:
+    case 69:
+    case 70:
+    case 71:
+    case 72:
+    case 73:
+    case 74:
+    case 75:
+    case 76:
+    case 77:
+    case 78:
+    case 79:
+    case 80:
+    case 81:
+    case 82:
+    case 83:
+    case 84:
+    case 85:
+    case 86:
+    case 87:
+    case 88:
+    case 89:
+    case 90:
+    case 91:
+    case 92:
+    case 93:
+    case 94:
+    case 95:
+        return &context->F[dw_reg - 64];
 #endif
     default: return NULL;
     }
@@ -874,7 +945,75 @@ static void set_context_reg( CONTEXT *context, ULONG_PTR dw_reg, void *val )
     case 93:
     case 94:
     case 95:
-        memcpy( &context->V[dw_reg - 64], val, sizeof(ARM64_NT_NEON128) );
+        memcpy( &context->V[dw_reg - 64], val, 4*32*sizeof(ULONGLONG) );
+        break;
+#elif defined(__loongarch_lp64)
+    case 0:  context->R0 = *(DWORD64 *)val; break;
+    case 1:  context->Ra = *(DWORD64 *)val; break;
+    case 2:  context->Tp = *(DWORD64 *)val; break;
+    case 3:  context->Sp = *(DWORD64 *)val; break;
+    case 4:  context->A0 = *(DWORD64 *)val; break;
+    case 5:  context->A1 = *(DWORD64 *)val; break;
+    case 6:  context->A2 = *(DWORD64 *)val; break;
+    case 7:  context->A3 = *(DWORD64 *)val; break;
+    case 8:  context->A4 = *(DWORD64 *)val; break;
+    case 9:  context->A5 = *(DWORD64 *)val; break;
+    case 10: context->A6 = *(DWORD64 *)val; break;
+    case 11: context->A7 = *(DWORD64 *)val; break;
+    case 12: context->T0 = *(DWORD64 *)val; break;
+    case 13: context->T1 = *(DWORD64 *)val; break;
+    case 14: context->T2 = *(DWORD64 *)val; break;
+    case 15: context->T3 = *(DWORD64 *)val; break;
+    case 16: context->T4 = *(DWORD64 *)val; break;
+    case 17: context->T5 = *(DWORD64 *)val; break;
+    case 18: context->T6 = *(DWORD64 *)val; break;
+    case 19: context->T7 = *(DWORD64 *)val; break;
+    case 20: context->T8 = *(DWORD64 *)val; break;
+    case 21: context->X0 = *(DWORD64 *)val; break;
+    case 22: context->Fp = *(DWORD64 *)val; break;
+    case 23: context->S0 = *(DWORD64 *)val; break;
+    case 24: context->S1 = *(DWORD64 *)val; break;
+    case 25: context->S2 = *(DWORD64 *)val; break;
+    case 26: context->S3 = *(DWORD64 *)val; break;
+    case 27: context->S4 = *(DWORD64 *)val; break;
+    case 28: context->S5 = *(DWORD64 *)val; break;
+    case 29: context->S6 = *(DWORD64 *)val; break;
+    case 30: context->S7 = *(DWORD64 *)val; break;
+    case 31: context->S8 = *(DWORD64 *)val; break;
+    case 32: context->Pc = *(DWORD64 *)val; break;
+    case 64:
+    case 65:
+    case 66:
+    case 67:
+    case 68:
+    case 69:
+    case 70:
+    case 71:
+    case 72:
+    case 73:
+    case 74:
+    case 75:
+    case 76:
+    case 77:
+    case 78:
+    case 79:
+    case 80:
+    case 81:
+    case 82:
+    case 83:
+    case 84:
+    case 85:
+    case 86:
+    case 87:
+    case 88:
+    case 89:
+    case 90:
+    case 91:
+    case 92:
+    case 93:
+    case 94:
+    case 95:
+        memcpy( &context->F[dw_reg - 64], val, 4*32*sizeof(ULONGLONG) );
         break;
 #endif
     }
@@ -990,6 +1129,8 @@ static void apply_frame_state( CONTEXT *context, struct frame_state *state,
 #ifdef __x86_64__
     new_context.Rsp = cfa;
 #elif defined(__aarch64__)
+    new_context.Sp = cfa;
+#elif defined(__loongarch_lp64)
     new_context.Sp = cfa;
 #endif
 
@@ -1129,6 +1270,13 @@ static void apply_frame_state( CONTEXT *context, struct frame_state *state,
 #define DW_REG_v13 77
 #define DW_REG_v14 78
 #define DW_REG_v15 79
+#elif defined(__loongarch_lp64)
+#define DW_OP_s0 DW_OP_breg23
+#define DW_OP_s1 DW_OP_breg24
+#define DW_OP_s2 DW_OP_breg25
+#define DW_OP_s3 DW_OP_breg26
+#define DW_OP_s4 DW_OP_breg27
+#define DW_OP_sp DW_OP_breg3
 
 #endif /* defined(__aarch64__) */
 

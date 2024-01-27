@@ -799,7 +799,9 @@ static void create_hardware_registry_keys(void)
     case PROCESSOR_ARCHITECTURE_AMD64:
         get_identifier( id, ARRAY_SIZE(id), !wcscmp(vendorid, L"AuthenticAMD") ? L"AMD64" : L"Intel64" );
         break;
-
+    case PROCESSOR_ARCHITECTURE_LOONGARCH64:
+        get_identifier( id, ARRAY_SIZE(id), L"LoongArch64" );
+        break;
     case PROCESSOR_ARCHITECTURE_INTEL:
     default:
         get_identifier( id, ARRAY_SIZE(id), L"x86" );
@@ -819,7 +821,9 @@ static void create_hardware_registry_keys(void)
     case PROCESSOR_ARCHITECTURE_ARM64:
         set_reg_value( system_key, L"Identifier", L"ARM processor family" );
         break;
-
+    case PROCESSOR_ARCHITECTURE_LOONGARCH64:
+        set_reg_value( system_key, L"Identifier", L"LoongArch64 processor family" );
+        break;
     case PROCESSOR_ARCHITECTURE_INTEL:
     case PROCESSOR_ARCHITECTURE_AMD64:
     default:
@@ -908,7 +912,9 @@ static void create_environment_registry_keys( void )
         arch = L"AMD64";
         parch = !wcscmp(vendorid, L"AuthenticAMD") ? L"AMD64" : L"Intel64";
         break;
-
+    case PROCESSOR_ARCHITECTURE_LOONGARCH64:
+        arch = parch = L"LoongArch64";
+        break;
     case PROCESSOR_ARCHITECTURE_INTEL:
     default:
         arch = parch = L"x86";
@@ -924,6 +930,9 @@ static void create_environment_registry_keys( void )
                   sci.ProcessorLevel, HIBYTE(sci.ProcessorRevision), LOBYTE(sci.ProcessorRevision) );
         break;
 
+    case PROCESSOR_ARCHITECTURE_LOONGARCH64:
+        swprintf( buffer, ARRAY_SIZE(buffer), L"LoongArch64 Family");
+        break;
     case PROCESSOR_ARCHITECTURE_AMD64:
     case PROCESSOR_ARCHITECTURE_INTEL:
     default:

@@ -1877,7 +1877,7 @@ typedef struct _KNONVOLATILE_CONTEXT_POINTERS
 
 #endif /* __aarch64__ */
 
-#if defined(__loongarch64)
+#if defined(__loongarch_lp64)
 
 // begin_ntddk begin_nthal
 //
@@ -1886,6 +1886,7 @@ typedef struct _KNONVOLATILE_CONTEXT_POINTERS
 
 #if !defined(RC_INVOKED)
 
+// Please refer to src/coreclr/pal/src/arch/loongarch64/asmconstants.h
 #define CONTEXT_LOONGARCH64   0x00800000
 
 
@@ -1897,14 +1898,38 @@ typedef struct _LOONGARCH64_RUNTIME_FUNCTION
 } LOONGARCH64_RUNTIME_FUNCTION;
 typedef LOONGARCH64_RUNTIME_FUNCTION RUNTIME_FUNCTION, *PRUNTIME_FUNCTION;
 
-#define CONTEXT_CONTROL          (CONTEXT_LOONGARCH64 | 0x00000001)
-#define CONTEXT_FLOATING_POINT   (CONTEXT_LOONGARCH64 | 0x00000002)
-#define CONTEXT_INTEGER          (CONTEXT_LOONGARCH64 | 0x00000004)
-#define CONTEXT_EXTENDED_FLOAT   (CONTEXT_FLOATING_POINT | 0x00000008)
-#define CONTEXT_EXTENDED_INTEGER (CONTEXT_INTEGER | 0x00000010)
 
-#define CONTEXT_FULL (CONTEXT_CONTROL | CONTEXT_FLOATING_POINT | \
-                      CONTEXT_INTEGER | CONTEXT_EXTENDED_INTEGER)
+#define CONTEXT_CONTROL (CONTEXT_LOONGARCH64 | 0x1)
+#define CONTEXT_INTEGER (CONTEXT_LOONGARCH64 | 0x2)
+#define CONTEXT_FLOATING_POINT  (CONTEXT_LOONGARCH64 | 0x4)
+#define CONTEXT_DEBUG_REGISTERS (CONTEXT_LOONGARCH64 | 0x8)
+#define CONTEXT_FULL (CONTEXT_CONTROL | CONTEXT_INTEGER | CONTEXT_FLOATING_POINT)
+
+#define CONTEXT_ALL (CONTEXT_CONTROL | CONTEXT_INTEGER | CONTEXT_FLOATING_POINT | CONTEXT_DEBUG_REGISTERS)
+#define CONTEXT_EXCEPTION_ACTIVE 0x8000000
+#define CONTEXT_SERVICE_ACTIVE 0x10000000
+#define CONTEXT_EXCEPTION_REQUEST 0x40000000
+#define CONTEXT_EXCEPTION_REPORTING 0x80000000
+
+//
+// This flag is set by the unwinder if it has unwound to a call
+// site, and cleared whenever it unwinds through a trap frame.
+// It is used by language-specific exception handlers to help
+// differentiate exception scopes during dispatching.
+//
+
+#define CONTEXT_UNWOUND_TO_CALL 0x20000000
+
+// begin_ntoshvp
+
+//
+// Specify the number of breakpoints and watchpoints that the OS
+// will track. Architecturally, LOONGARCH64 supports up to 16. In practice,
+// however, almost no one implements more than 4 of each.
+//
+
+#define LOONGARCH64_MAX_BREAKPOINTS     8
+#define LOONGARCH64_MAX_WATCHPOINTS     2
 
 #endif
 
@@ -2600,11 +2625,18 @@ static FORCEINLINE struct _TEB * WINAPI NtCurrentTeb(void)
 {
     return (struct _TEB *)(ULONG_PTR)_MoveFromCoprocessor(15, 0, 13, 0, 2);
 }
-#elif defined(__loongarch64)
+#elif defined(__loongarch_lp64) && defined(__GNUC__)
 static FORCEINLINE struct _TEB * WINAPI NtCurrentTeb(void)
 {
     struct _TEB *teb;
-    __asm__("or %0, $tp, $zero" : "=r" (teb));
+    __asm__("move %0, $tp" : "=r" (teb));
+    return teb;
+}
+#elif defined(__loongarch_lp64) && defined(_MSC_VER)
+static FORCEINLINE struct _TEB * WINAPI NtCurrentTeb(void)
+{
+    struct _TEB *teb;
+    __asm__("move %0, $tp" : "=r" (teb));
     return teb;
 }
 #elif !defined(RC_INVOKED)

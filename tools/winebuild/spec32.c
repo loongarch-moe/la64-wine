@@ -405,13 +405,21 @@ static void output_relay_debug( DLLSPEC *spec )
             output_seh( ".seh_endprologue" );
             switch (stack_size)
             {
-            case 64: output( "\tst.d $a3, $sp, 64\n" );
+            case 64:
+                output( "\tst.d $a7, $sp, 64\n" );
+                output( "\tst.d $a6, $sp, 56\n" );
             /* fall through */
-            case 48: output( "\tst.d $a2, $sp, 48\n" );
+            case 48:
+                output( "\tst.d $a5, $sp, 48\n" );
+                output( "\tst.d $a4, $sp, 40\n" );
             /* fall through */
-            case 32: output( "\tst.d $a1, $sp, 32\n" );
+            case 32:
+                output( "\tst.d $a3, $sp, 32\n" );
+                output( "\tst.d $a2, $sp, 24\n" );
             /* fall through */
-            case 16: output( "\tst.d $a0, $sp, 16\n" );
+            case 16:
+                output( "\tst.d $a1, $sp, 16\n" );
+                output( "\tst.d $a0, $sp, 8\n" );
             /* fall through */
             default: break;
             }

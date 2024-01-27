@@ -669,9 +669,27 @@ __ASM_GLOBAL_FUNC(_start,
                   "addi.d  $tp, $a0, 0\n\t"
                   "addi.d  $a0, $sp, 0\n\t"
                   "bl wld_start\n\t"
-                  "addi.d $sp, $s1, 0\n\t"
-                  "pcaddi $a0, -17557\n\t"
-                  "jr $s0")
+                  "ld.d $t0, $sp, 0\n\t"
+                  "addi.d $sp, $t0, 0\n\t"
+                  "addi.d $ra, $a0, 0\n\t"
+                  "addi.d $a0, $zero, 0\n\t"
+                  "addi.d $a1, $zero, 0\n\t"
+                  "addi.d $a2, $zero, 0\n\t"
+                  "addi.d $a3, $zero, 0\n\t"
+                  "addi.d $a4, $zero, 0\n\t"
+                  "addi.d $a5, $zero, 0\n\t"
+                  "addi.d $a6, $zero, 0\n\t"
+                  "addi.d $a7, $zero, 0\n\t"
+                  "addi.d $t0, $zero, 0\n\t"
+                  "addi.d $t1, $zero, 0\n\t"
+                  "addi.d $t2, $zero, 0\n\t"
+                  "addi.d $t3, $zero, 0\n\t"
+                  "addi.d $t4, $zero, 0\n\t"
+                  "addi.d $t5, $zero, 0\n\t"
+                  "addi.d $t6, $zero, 0\n\t"
+                  "addi.d $t7, $zero, 0\n\t"
+                  "addi.d $t8, $zero, 0\n\t"
+                  "ret")
 
 #define SYSCALL_FUNC( name, nr ) \
     __ASM_GLOBAL_FUNC( name, \

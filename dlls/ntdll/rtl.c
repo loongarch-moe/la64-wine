@@ -650,12 +650,10 @@ __ASM_FASTCALL_FUNC(RtlUlonglongByteSwap, 8,
                     "bswap %eax\n\t"
                     "ret $8")
 #endif
-#ifdef __loongarch_lp64
-__ASM_GLOBAL_FUNC(RtlUlonglongByteSwap,
-                    "nop\n\t"
-                    "nop\n\t"
-                    "ret")
-#endif
+//#ifdef __loongarch_lp64
+//__ASM_GLOBAL_FUNC(RtlUlonglongByteSwap,
+//                    "break 1")
+//#endif
 /*************************************************************************
  * RtlUlongByteSwap    [NTDLL.@]
  *
@@ -671,14 +669,24 @@ __ASM_FASTCALL_FUNC(RtlUlongByteSwap, 4,
                     "ret")
 #endif
 #ifdef __loongarch_lp64
-__ASM_GLOBAL_FUNC(RtlUlongByteSwap,
-                    "nop\n\t"
-                    "nop\n\t"
-                    "ret")
-
-_Bool __sync_bool_compare_and_swap_16(volatile void * ptr, __int128 unsigned src,  __int128 unsigned tar){
-return 1;
-}
+// https://github.com/loongson-community/discussions/issues/16
+// 128 atomic support
+__ASM_GLOBAL_FUNC("__sync_bool_compare_and_swap_16",
+    "move $t0, $a0\n"
+    "1:\n"
+    "llacq.d $t1, $t0\n"
+    "ldptr.d $t2, $t0, 8\n"
+    "bne $t1, $a1, 2f\n"
+    "bne $t2, $a2, 2f\n"
+    "move $a0, $a3\n"
+    "sc.q $a0, $a4, $t0\n"
+    "beqz $a0, 1b\n"
+    "b 3f\n"
+    "2:\n"
+    "move $a0, $zero\n"
+    "dbar 0b10100\n"
+    "3:\n"
+    "ret");
 #endif
 /*************************************************************************
  * RtlUshortByteSwap    [NTDLL.@]
@@ -695,12 +703,12 @@ __ASM_FASTCALL_FUNC(RtlUshortByteSwap, 4,
                     "ret")
 #endif
 
-#ifdef __loongarch64
-__ASM_GLOBAL_FUNC(RtlUshortByteSwap,
-                    "nop\n\t"
-                    "nop\n\t"
-                    "ret")
-#endif
+//#ifdef __loongarch64
+//__ASM_GLOBAL_FUNC(RtlUshortByteSwap,
+//                    "nop\n\t"
+//                    "nop\n\t"
+//                    "ret")
+//#endif
 
 
 /*************************************************************************

@@ -315,6 +315,7 @@ static const char *get_pe_dir( WORD machine )
     case IMAGE_FILE_MACHINE_AMD64: return "/x86_64-windows";
     case IMAGE_FILE_MACHINE_ARMNT: return "/arm-windows";
     case IMAGE_FILE_MACHINE_ARM64: return "/aarch64-windows";
+    case IMAGE_FILE_MACHINE_LOONGARCH64: return "/loongarch64-windows";
     default: return "";
     }
 }
@@ -1797,7 +1798,7 @@ static void start_main_thread(void)
 
     signal_init_threading();
     signal_alloc_thread( teb );
-    dbg_init();
+//    dbg_init();
     startup_info_size = server_init_process();
     virtual_map_user_shared_data();
     init_cpu_info();
@@ -1808,7 +1809,7 @@ static void start_main_thread(void)
     init_thread_stack( teb, 0, 0, 0 );
     NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );
     load_ntdll();
-    load_wow64_ntdll( main_image_info.Machine );
+//    load_wow64_ntdll( main_image_info.Machine );
     load_apiset_dll();
     server_init_process_done();
 }

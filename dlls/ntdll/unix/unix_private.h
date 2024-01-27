@@ -121,8 +121,11 @@ struct async_fileio
     struct async_fileio *next;
     HANDLE               handle;
 };
-
+#if defined(__loongarch_lp64)
+static const SIZE_T page_size = 0x4000;
+#else
 static const SIZE_T page_size = 0x1000;
+#endif
 static const SIZE_T teb_size = 0x3800;  /* TEB64 + TEB32 + debug info */
 static const SIZE_T signal_stack_mask = 0xffff;
 static const SIZE_T signal_stack_size = 0x10000 - 0x3800;
